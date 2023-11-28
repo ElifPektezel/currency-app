@@ -49,14 +49,12 @@
 }
 .btn-field{
     width: 100%;
-    display: flex;
-    justify-content: space-between;
 }
 
 .btn-field button{
     background: #2d3a74;
-    width: 200px;
-    margin-right: 5px;
+    width: 40%;
+    margin-right:5px;
     color: white;
     height: 40px;
     border-radius: 20px;
@@ -67,7 +65,7 @@
 }
 .btn-field button.disable{
     background: #eaeaea;
-    width: 200px;
+    width: 40%;
     color: #555;
     height: 40px;
     border-radius: 20px;
@@ -75,6 +73,7 @@
     outline: 0;
     cursor: pointer;
     transition: background 1s;
+    float: right;
 }
 form .btn{
     background-color: #2d3a74;

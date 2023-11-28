@@ -1,31 +1,46 @@
-// Kullanıcı bilgilerini tarayıcıdan al
-let UserCreds = JSON.parse(sessionStorage.getItem("user-creds"));
-let UserInfo = JSON.parse(sessionStorage.getItem("user-info"));
-
+let UserCreds = JSON.parse(localStorage.getItem("user-creds"));
+let UserInfo = JSON.parse(localStorage.getItem("user-info"));
 
 let MsgHead = document.getElementById('msg');
 let GreetHead = document.getElementById('greet');
 let SignoutBtn = document.getElementById('signoutbutton');
 
-// user çıkış işlevi
+let logoutTimeout;
+
+//  kullanıcının oturumunu sonlandırmak için
 let Signout = () => {
-    // Tarayıcıdaki kullanıcı bilgilerini temizle
-    sessionStorage.removeItem("user-creds");
-    sessionStorage.removeItem("user-info");
-    // Giriş sayfasına yönlendir
+    localStorage.removeItem("user-creds");
+    localStorage.removeItem("user-info");
+    clearInterval(logoutTimeout);
     window.location.href = 'login.html';
 }
 
-// user durumunu kontrol etme
-let CheckCred = () => {
-    // Eğer kullanıcı bilgileri yoksa, giriş sayfasına yönlendir
-    if (!UserCreds) {
-        window.location.href = 'login.html';
-    } else {
-        MsgHead.innerText = `${UserCreds.email}`;
-        GreetHead.innerText = `${UserInfo.firstname + " " + UserInfo.lastname}`;
-    }
+//  oturum süresini sıfırlamak için
+let resetLogoutTimeout = () => {
+    clearInterval(logoutTimeout);
+    logoutTimeout = setTimeout(() => {
+       
+        Signout();
+    }, 5 * 1000); // 5 saniye sonra otomatik çıkış yapıyo bunu 24 saat de yapabilirim ehehe)
 }
+let CheckCred = () => {
+  if (!localStorage.getItem("user-creds")) {
+      window.location.href = 'login.html';
+  } else {
+      MsgHead.innerText = `${UserCreds.email}`;
+      GreetHead.innerText = `${UserInfo.firstname + " " + UserInfo.lastname}`;
+  }
+}
+
+// Sayfa yüklendiğinde süreyi sıfırla
+resetLogoutTimeout();
 
 window.addEventListener('load', CheckCred);
 SignoutBtn.addEventListener('click', Signout);
+
+
+window.addEventListener('beforeunload', () => {
+    // Oturum bilgilerini localStorage'a kaydet
+    localStorage.setItem("user-creds", JSON.stringify(UserCreds));
+    localStorage.setItem("user-info", JSON.stringify(UserInfo));
+});
