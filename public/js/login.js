@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-import { getDatabase, get, ref, child} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+import { getDatabase, get, ref, child } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
 const firebaseConfig = {
   apiKey: "AIzaSyDE9y25K_nWB05mR5Nlfpi-fKfFQkvQfyQ",
@@ -20,22 +20,31 @@ let EmailInp = document.getElementById('emailInp');
 let PassInp = document.getElementById('passwordInp');
 let MainForm = document.getElementById('MainForm');
 
+function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 let SignInUser = evt => {
   evt.preventDefault();
-  let currentUser; // Kullanıcının bilgilerini saklamak için bir değişken tanımla
+  let currentUser;
+
+  // E-posta formatını kontrol et
+  if (!validateEmail(EmailInp.value)) {
+    showInfo("Invalid email format!");
+    return;
+  }
 
   signInWithEmailAndPassword(auth, EmailInp.value, PassInp.value)
     .then((credentials) => {
       currentUser = credentials.user; // credentials.user'ı sakla
-      // Kullanıcı girişi başarılı, JWT token'ını al
+
       return currentUser.getIdToken();
     })
     .then((idToken) => {
       // JWT token'ını kullan
 
       sessionStorage.setItem("firebase-id-token", idToken);
-
-      // Ardından, kullanıcı bilgilerini alabilir ve yönlendirme işlemini gerçekleştirebilirsiniz.
       return get(child(dbref, 'UsersAuthList/' + currentUser.uid));
     })
     .then((snapshot) => {
@@ -49,10 +58,8 @@ let SignInUser = evt => {
         window.location.href = 'home.html';
       }
     })
-    .catch((error) => {
-      alert(error.message);
-      console.log(error.code);
-      console.log(error.message);
+    .catch(() => {
+      showInfo("Invalid user or password!");
     });
 }
 

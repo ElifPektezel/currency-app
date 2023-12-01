@@ -13,6 +13,7 @@ let Signout = () => {
     localStorage.removeItem("user-info");
     clearInterval(logoutTimeout);
     window.location.href = 'login.html';
+
 }
 
 //  oturum süresini sıfırlamak için
@@ -21,7 +22,7 @@ let resetLogoutTimeout = () => {
     logoutTimeout = setTimeout(() => {
        
         Signout();
-    }, 5 * 1000); // 5 saniye sonra otomatik çıkış yapıyo bunu 24 saat de yapabilirim ehehe)
+    }, 60 * 60 * 1000);
 }
 let CheckCred = () => {
   if (!localStorage.getItem("user-creds")) {
@@ -29,7 +30,7 @@ let CheckCred = () => {
   } else {
       MsgHead.innerText = `${UserCreds.email}`;
       GreetHead.innerText = `${UserInfo.firstname + " " + UserInfo.lastname}`;
-  }
+    }
 }
 
 // Sayfa yüklendiğinde süreyi sıfırla

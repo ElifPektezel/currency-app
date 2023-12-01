@@ -18,12 +18,28 @@
       <link rel="stylesheet" href="./style/register.css">
   </head>
   <body>
-   
+    <div id="customAlert" class="custom-alert">
+      <p><button id="closeButton" ><i class="fa-solid fa-x icn"></i></button></p> 
+       
+       <p class="alertIcon"><i class="fa-regular fa-circle-check"></i></p>
+       <p id="alertMessage"></p>
+       <div class="alertButtonForm">
+         
+       <a href="./login.html"><button class="alertFixedBtn">Login</button></a>
+     </div>
+     </div>
+     
+     <div id="customAlertContainer" class="custom-alert-container">
+       <span id="alertMessageIcon" class="alert-message-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+       <span id="alertMessageText" class="alert-message-text"></span>
+       <span id="closeButtonIcon" class="close-button-icon" onclick="closeCustomAlert()">X</span>
+     </div>
+
 <form class="form" id="MainForm" >
   <div class="form-input">
     <h1 class="form-title">Login</h1>
     <div class="form-floating mb-3">
-      <input type="email" class="form-control" id="emailInp" placeholder="name@example.com">
+      <input  class="form-control" id="emailInp" placeholder="name@example.com">
       
       <label for="emailInp">Email address</label>
     </div>
@@ -50,6 +66,8 @@
       integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
       crossorigin="anonymous">
 </script>
+<script src="./js/notification.js"></script>
+<script src="./js/warning.js"></script>
 <script type="module" src="./js/login.js"></script>
   </body>
 </html>
