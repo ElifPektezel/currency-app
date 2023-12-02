@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
 import { getDatabase, set, ref } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDE9y25K_nWB05mR5Nlfpi-fKfFQkvQfyQ",
@@ -25,28 +25,36 @@ let MainForm = document.getElementById('MainForm');
 let RegisterUser = evt => {
   evt.preventDefault();
 
+  // Hataları tutacak dizi, errors.push ile diziye ekle
+  let errors = [];
+
   // E-posta kontrolü
   if (!isValidEmail(EmailInp.value)) {
-    showInfo("Enter a valid email address.");
-    return;
+    errors.push("Enter a valid email address.");
   }
 
   // Şifre kontrolü: En az bir büyük harf içermeli
   if (!/[A-Z]/.test(PassInp.value)) {
-    showInfo("The password must contain at least one uppercase letter.");
+    errors.push("The password must contain at least one uppercase letter.");
+  }
+
+  // Ad ve soyad kontrolü
+  if (!FnameInp.value || !LnameInp.value) {
+    errors.push("First name and last name are required.");
+  }
+
+  // errors dizisi doluysa showinfoda göster 
+  if (errors.length > 0) {
+    showInfo(errors.join("\n"));
     return;
   }
-    // Ad ve soyad kontrolü
-    if (!FnameInp.value || !LnameInp.value) {
-      showInfo("First name and last name are required.");
-      return;
-    }
+
 
   function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
-  
+
   // database'e büyük harfle kaydet
   const firstname = FnameInp.value.toUpperCase();
   const lastname = LnameInp.value.toUpperCase();
@@ -54,19 +62,26 @@ let RegisterUser = evt => {
   // Kullanıcıyı oluştur
   createUserWithEmailAndPassword(auth, EmailInp.value, PassInp.value)
     .then((credentials) => {
-      console.log(credentials);
+      // Kullanıcıya doğrulama e-postası gönder
+      sendEmailVerification(credentials.user)
+        .then(() => {
+          console.log("doğrulama maili gitti");
+        })
+        .catch((error) => {
+          console.error("mail gönderilmedi", error);
+        });
+
+      // Kullanıcının bilgilerini database'e kaydet
       set(ref(db, 'UsersAuthList/' + credentials.user.uid), {
         firstname: firstname,
         lastname: lastname
       });
-      showAlert("The user has been created successfully.");
 
+      showAlert("The user has been created successfully. Please check your email for verification.");
     })
     .catch(() => {
-      showInfo("This user has been registered before.");
-    })
-}
+      showInfo("Please verify your e-mail address!");
+    });
+};
 
 MainForm.addEventListener('submit', RegisterUser);
-
-

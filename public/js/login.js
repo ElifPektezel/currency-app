@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-import { getDatabase, get, ref, child } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
+import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
 const firebaseConfig = {
   apiKey: "AIzaSyDE9y25K_nWB05mR5Nlfpi-fKfFQkvQfyQ",
   authDomain: "currency-app-dd6be.firebaseapp.com",
@@ -39,11 +39,15 @@ let SignInUser = evt => {
     .then((credentials) => {
       currentUser = credentials.user; // credentials.user'ı sakla
 
-      return currentUser.getIdToken();
-    })
-    .then((idToken) => {
-      // JWT token'ını kullan
+      if (!currentUser.emailVerified) {
+        showInfo("Please verify your e-mail address!");
+        return sendEmailVerification(currentUser);
+      }
 
+      return Promise.resolve(); // Doğrulama yapılmışsa devamke
+    })
+    .then(() => currentUser.getIdToken())
+    .then((idToken) => {
       sessionStorage.setItem("firebase-id-token", idToken);
       return get(child(dbref, 'UsersAuthList/' + currentUser.uid));
     })
@@ -55,13 +59,17 @@ let SignInUser = evt => {
         }));
 
         sessionStorage.setItem("user-creds", JSON.stringify(currentUser));
+
         window.location.href = 'home.html';
       }
     })
-    .catch(() => {
-      showInfo("Invalid user or password!");
+    .catch((error) => {
+      if (error.code === 'auth/too-many-requests') {
+        showInfo("Please verify your e-mail address!");
+      } else {
+        showInfo("Invalid user or password!");
+      }
     });
 }
-
 
 MainForm.addEventListener('submit', SignInUser);
